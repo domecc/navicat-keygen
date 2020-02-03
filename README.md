@@ -1,17 +1,15 @@
 # Navicat Keygen
 
-[中文版README](README.zh-CN.md)
+[英文版README](README.md)
 
-This repository will tell you how Navicat offline activation works.
+这份repo将会告诉你Navicat是怎么完成离线激活的。
 
-[How does it work?](HOW_DOES_IT_WORK.md)
+[注册机是怎么工作的?](HOW_DOES_IT_WORK.zh-CN.md)
 
-__NOTICE: This keygen only supports Navicat Premium.__
+## 1. 如何编译
 
-## 1. How to build
+* 在编译之前，你应该确保你有如下几个库：
 
-* Before you build keygen, you should make sure you have following libs:
- 
   ```
   openssl
   capstone
@@ -19,44 +17,46 @@ __NOTICE: This keygen only supports Navicat Premium.__
   rapidjson
   libplist
   ```
-
-  You can install them by 
   
-  ```shell
+  如果你有`brew`的话，你可以通过
+  
+  ```
   $ brew install openssl
   $ brew install capstone
   $ brew install keystone
   $ brew install rapidjson
   $ brew install libplist
   ```
+  
+  来完成它们的安装。
 
-* Clone `mac` branch and build keygen and patcher:
+* Clone `mac` 分支，并编译keygen和patcher
 
-  ```shell
+  ```bash
   $ git clone -b mac --single-branch https://github.com/DoubleLabyrinth/navicat-keygen.git
   $ cd navicat-keygen
   $ make all
   ```
 
-  You will see two executable files in `bin/` directory:
+  编译完成后你会在 `bin/` 文件夹下看到两个可执行文件： 
 
-  ```shell
+  ```bash
   $ ls bin/
   navicat-keygen    navicat-patcher
   ```
 
-## 2. How to Use
+## 2. 如何使用这个Keygen
 
-1. Build keygen and patcher.
+1. 编译好keygen和patcher。
 
-2. Backup all of your saved database connection configurations (with password). 
+2. 备份好Navicat中所有已保存的数据库连接（包括密码）。
 
-3. Remove all connections, if have, that Navicat saved in `Keychain Access.app`. 
+3. 移除所有Navicat在 `Keychain Access.app` （即钥匙链）中保存的连接，如果有的话。
 
-   You can find them by search with keyword `navicat` in `Keychain Access.app`.
+   你可以通过在 `Keychain Access.app` 中搜索关键词 `navicat` 来找到它们。
 
-4. Use `navicat-patcher` to replace __Navicat Activation Public Key__.
-   
+4. 使用`navicat-patcher`替换掉公钥：
+
    ```
    Usage:
        navicat-patcher <Navicat installation path> [RSA-2048 Private Key File]
@@ -70,25 +70,23 @@ __NOTICE: This keygen only supports Navicat Premium.__
                                           This parameter is optional.
    ```
 
-   * `<Navicat installation path>`: The path to `Navicat Premium.app`.
+   * `<Navicat installation path>`: `Navicat Premium.app` 的路径。
      
-     __This parameter must be specified.__
+     __这个参数必须指定。__
 
-   * `[RSA-2048 PrivateKey(PEM file)]`: The path to an RSA-2048 private key file. 
+   * `[RSA-2048 PrivateKey(PEM file)]`: PEM格式的RSA-2048私钥文件路径。
      
-     __This parameter is optional.__ 
+     __这个参数是可选的。__ 
      
-     If not specified, `navicat-patcher` will generate a new RSA-2048 private key file `RegPrivateKey.pem` at current directory.
+     如果没有指定，`navicat-patcher`将会在当前目录下生成一个新的RSA-2048私钥文件`RegPrivateKey.pem`。
 
-   __Example:__ 
+   __例如：__
 
    ```console
    $ ./navicat-patcher /Applications/Navicat\ Premium.app/
    ```
 
-   It has been tested on __Navicat Premium 12.1.24 For Mac Simplified Chinese__ version. 
-   
-   The following is an example of output:
+   __Navicat Premium For Mac 12.1.24 简体中文版__ 已通过测试。下面将是一份样例输出：
 
    ```console
    $ ./navicat-patcher /Applications/Navicat\ Premium.app/
@@ -183,44 +181,42 @@ __NOTICE: This keygen only supports Navicat Premium.__
    **************************************************************
    ```
 
-   * __FOR Navicat Premium version < 12.0.24 ONLY:__
+   * __仅对 Navicat Premium 版本 < 12.0.24 的说明：__
 
-     `navicat-patcher` will abort and won't apply any patch. 
+     如果你的Navicat版本小于12.0.24，那么`navicat-patcher`将会终止并且不会修改目标文件。
    
-     You should use openssl to generate `RegPrivateKey.pem` and `rpk` file.
-   
+     你必须使用openssl生成`RegPrivateKey.pem`和`rpk`文件：
+
      ```console
      $ openssl genrsa -out RegPrivateKey.pem 2048
      $ openssl rsa -in RegPrivateKey.pem -pubout -out rpk
-     ```
-   
-     Then replace 
+     ``` 
+
+     接着用刚生成的`rpk`文件替换
 
      ```
      /Applications/Navicat Premium.app/Contents/Resources/rpk
      ```
 
-     by `rpk` you just generated.
+5. __生成一份自签名的代码证书，并总是信任该证书。这一步非常重要。__
 
-5. __Generate a self-signed code-sign certificate and always trust it.__
-
-   __Then use `codesign` to re-sign `Navicat Premium.app`.__
+   __然后用`codesign`对`Navicat Premium.app`重签名。__
 
    ```console
    $ codesign -f -s "Your self-signed code-sign certificate name" <path to Navicat Premium.app>
    ```
 
-   __NOTICE:__ 
+   __注意：__ 
    
-   "Your self-signed code-sign certificate name" is the name of your certificate in `Keychain Access.app`, not path.
+   "Your self-signed code-sign certificate name"是你证书的名字，不是路径。
 
-   __Example:__
+   __例如：__
 
    ```console
    $ codesign -f -s "foobar" /Applications/Navicat\ Premium.app/
    ```
 
-6. Then use `navicat-keygen` to generate __snKey__ and __Activation Code__.
+6. 接下来使用`navicat-keygen`来生成 __序列号__ 和 __激活码__。
 
    ```
    Usage:
@@ -230,17 +226,17 @@ __NOTICE: This keygen only supports Navicat Premium.__
                                           This parameter must be specified.
    ```
 
-   * `<RSA-2048 Private Key File>`: Path to a PEM-format RSA-2048 private key file. 
+   * `<RSA-2048 Private Key File>`: PEM格式的RSA-2048私钥文件路径。
      
-     __This parameter must be specified.__
+     __这个参数必须指定。__
 
-   __Example:__
+   __例如：__ 
 
    ```console
    $ ./navicat-keygen ./RegPrivateKey.pem
    ```
 
-   You will be asked to select Navicat language and give major version number. After that an randomly generated __snKey__ will be given.
+   你会被要求选择Navicat的语言以及输入主版本号。之后会随机生成一个 __序列号__。
 
    ```console
    $ ./navicat-keygen ./RegPrivateKey.pem
@@ -272,27 +268,25 @@ __NOTICE: This keygen only supports Navicat Premium.__
    Your name:
    ```
 
-   You can use this __snKey__ to activate your Navicat preliminarily.
-     
-   Then you will be asked to input `Your name` and `Your organization`. Just set them whatever you want, but not too long.
+   你可以使用这个 __序列号__ 暂时激活Navicat。
+
+   接下来你会被要求输入`用户名`和`组织名`；请随便填写，但不要太长。
 
    ```console
    Your name: DoubleLabyrinth
    Your organization: DoubleLabyrinth
    Input request code (in Base64), input empty line to end:
    ```
-     
-   After that, you will be asked to input request code. Now __DO NOT CLOSE KEYGEN__.
+ 
+   之后你会被要求填入请求码。注意 __不要关闭注册机__。
 
-7. __Disconnect your network__ and open Navicat Premium. 
+7. __断开网络__ 并打开Navicat。
 
-   Find and click `Registration`. 
-   
-   Fill license key by __Serial number__ that the keygen gave and click `Activate`.
+   找到`注册`窗口，填入注册机给你的序列号。然后点击`激活`按钮。
 
-8. Generally online activation will fail and Navicat will ask you do `Manual Activation`, just choose it.
+8. 一般来说在线激活肯定会失败，这时候Navicat会询问你是否`手动激活`，直接选吧。
 
-9. Copy your request code and paste it in the keygen. Input empty line to tell the keygen that your input ends.
+9. 在`手动激活`窗口你会得到一个请求码，复制它并把它粘贴到keygen里。最后别忘了连按至少两下回车结束输入。
 
    ```console
    Your name: DoubleLabyrinth
@@ -311,9 +305,8 @@ __NOTICE: This keygen only supports Navicat Premium.__
    Vd4QUzEw6DPNpJLYVKV6ZNDny0gsZWCXbKyrf2nF27iTM35YUBouXEcAB/Vy355V2z++7iXe/coKmV4kNZbywlBchI5ts7gOHnhXWzBYQ3yKsBYKob/7sxaiw7CXCmhM4mPLMzrp5okewCWjBjb51keZ4SA3F6j8HGIVYiZW3CAZtkjxs9uUoXvVIJr+Gt83TgU+sqiC4oSplokopAql2zWPieA9KuhPoCKiGLMvuQwv0wWWPc2HorY0AHAetsyZ8MN4utZ2ylQ9z/ZojwX1KViyh3xxnjWF7xXJljIdBA4tCi4QDqDLvTuICfUV7VeKzOUY+ZKCO0xGxkTe1HVwog==
    ```
 
-10. Finally, you will get __Activation Code__ which looks like a Base64 string. 
+10. 如果不出意外，你会得到一个看似用Base64编码的激活码。
 
-    Just copy it and paste it in Navicat `Manual Activation` window, then click `Activate`. 
+    直接复制它，并把它粘贴到Navicat的`手动激活`窗口，最后点`激活`按钮。
     
-    If nothing wrong, activation should be done successfully.
-
+    如果没什么意外的话应该能成功激活。
